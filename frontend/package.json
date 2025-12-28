@@ -13,6 +13,7 @@
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@types/wicg-file-system-access": "^2023.10.7",
     "dreamland": "^0.1.3"
   }
 }

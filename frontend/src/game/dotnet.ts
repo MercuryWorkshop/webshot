@@ -2,7 +2,7 @@ import { createState, Stateful } from "dreamland/core";
 import { DotnetHostBuilder, MonoConfig } from "./dotnetdefs";
 import { SteamJS } from "./steam";
 
-const SEAMLESSCOUNT = 5;
+const SEAMLESSCOUNT = 10;
 
 export type Log = { color: string; log: string };
 export const gameState: Stateful<{
@@ -116,12 +116,13 @@ export async function patch() {
 
 export async function run() {
 	gameState.playing = true;
+
 	gameState.initting = true;
-
-	console.debug("Init...");
-	const before = performance.now();
-
+	console.log("Init...");
+	console.time("Init ");
 	await exports.OneshotLoader.Init();
+
+	console.timeLog("Init ");
 
 	// run some frames for seamless transition
 	for (let i = 0; i < SEAMLESSCOUNT; i++) {
@@ -129,16 +130,12 @@ export async function run() {
 		if (!(await exports.OneshotLoader.RunOneFrame()))
 			throw new Error("RunOneFrame() Failed!");
 	}
-
-	const after = performance.now();
-	console.debug(`Init : ${(after - before).toFixed(2)}ms`);
+	console.timeEnd("Init ");
 	gameState.initting = false;
 
 	await exports.OneshotLoader.MainLoop();
 
 	console.debug("Cleanup...");
-
 	await exports.OneshotLoader.Cleanup();
-	gameState.ready = false;
 	gameState.playing = false;
 }

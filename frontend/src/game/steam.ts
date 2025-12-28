@@ -1,4 +1,4 @@
-let username = "Toshit";
+import { settings } from "../store";
 
 export let SteamJS = {
 	GetAchievement(achievement: string) {
@@ -17,6 +17,6 @@ export let SteamJS = {
 	},
 	GetPersonaName() {
 		console.debug("[Steamworks] GetPersonaName");
-		return username;
+		return settings.name;
 	}
 };

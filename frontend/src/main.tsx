@@ -1,36 +1,21 @@
-import { patch, preInit, run } from "./game/dotnet";
-import { copyFile, copyFolder, rootFolder } from "./game/fs";
+import { createDelegate } from "dreamland/core";
+import { GameView } from "./game";
+import { patch } from "./game/dotnet";
+import { copyGame, wasPatched, wasGameCopied } from "./game/fs";
 
-let canvas = <canvas id="canvas" class="canvas" />;
-document.querySelector("#app")?.replaceWith(canvas);
-
-let hasGame = false;
-try {
-	await rootFolder.getDirectoryHandle("OneShot", { create: false })
-	hasGame = true;
-} catch { }
-
+let hasGame = await wasGameCopied();
 console.log("has game", hasGame);
 
-let hasPatch = false;
-try {
-	await rootFolder.getFileHandle("OneShot.dll", { create: false })
-	hasPatch = true;
-} catch { }
-
+let hasPatch = await wasPatched();
 console.log("has patch", hasPatch);
-
-await preInit();
 
 if (!hasGame) {
 	await new Promise<void>(r => {
 		let handler = async () => {
 			let dir = await showDirectoryPicker();
-			let game = await rootFolder.getDirectoryHandle("OneShot", { create: true });
 
-			await copyFile(await dir.getFileHandle("OneShotMG.exe", { create: false }), game);
-			await copyFolder(await dir.getDirectoryHandle("content", { create: false }), game);
-			await copyFolder(await dir.getDirectoryHandle("gamedata", { create: false }), game);
+			await copyGame(dir, x => console.log("copy percent:", x));
+
 			r();
 			window.removeEventListener("click", handler);
 		};
@@ -42,4 +27,8 @@ if (!hasPatch) {
 	await patch();
 }
 
-await run();
+let preinit = createDelegate<void>();
+let canvas = <GameView preinit={preinit} />;
+document.querySelector("#app")?.replaceWith(canvas);
+
+preinit();
