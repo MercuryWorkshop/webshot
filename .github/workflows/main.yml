@@ -82,7 +82,7 @@ jobs:
         with:
           name: Continuous Build
           tag: latest
-          commit: threads-v2
+          commit: master
           body: "${{ github.event.head_commit.url }} ${{ github.event.head_commit.message }}"
           artifacts: oneshot-loader.tar.zst
 
