@@ -3,7 +3,7 @@ import { GameView } from "./game";
 import { StickyNote } from "./splash";
 import { settings } from "./store";
 
-let App: Component<{}, { showSplash: boolean }> = function (cx) {
+let App: Component<{}, { showSplash: boolean }> = function () {
 	let preinit = createDelegate<void>();
 
 	let firstSplash = true;
