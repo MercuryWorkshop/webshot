@@ -1,7 +1,7 @@
 import { Component, css, Delegate } from "dreamland/core";
 import { gameState, patch, preInit, run } from "./dotnet";
 import { copyGame, wasGameCopied, wasPatched, setSourceFolder, hasSourceFolder, getSourceFolder, verifyGameFolder } from "./fs";
-import { StickyNoteMinimal } from "../splash";
+import { StickyNote } from "../splash";
 import { settings } from "../store";
 
 type SetupStep = "none" | "no-disk" | "welcome" | "name" | "copying";
@@ -10,7 +10,8 @@ let NoBootableDevice: Component = function () {
 	return (
 		<div>
 			<div>No bootable device found</div>
-			<div>Please insert World Machine OS disk</div>
+			<div>Please insert World Machine OS disk.</div>
+			<div>You can obtain the disk through <a href="https://store.steampowered.com/app/2915460/OneShot_World_Machine_Edition/" target="_blank">your local Valve Software location.</a></div>
 		</div>
 	)
 }
@@ -171,36 +172,89 @@ CopyAssetsSlot.style = css`
 	}
 `;
 
-let StickyNoteButton: Component<{ open: () => void }> = function () {
+let StickyNoteWidget: Component<{}, { expanded: boolean }> = function () {
+	this.expanded = false;
+
+	let handleNoteClick = (e: Event) => {
+		if (this.expanded) {
+			e.stopPropagation();
+		} else {
+			this.expanded = true;
+		}
+	};
+
 	return (
-		<div>
-			<button on:click={this.open}>
-				<StickyNoteMinimal />
-			</button>
+		<div class:expanded={use(this.expanded)}>
+			<div class="placeholder" />
+			<div class="backdrop" on:click={() => this.expanded = false} />
+			<div class="sticky-note" on:click={() => this.expanded = !this.expanded}>
+				<StickyNote done={() => {this.expanded = false}} />
+			</div>
 		</div>
 	)
 }
-StickyNoteButton.style = css`
+StickyNoteWidget.style = css`
 	:scope {
 		align-self: flex-end;
-		height: 2.25rem;
-		transform: rotate(-3deg);
+		overflow: visible;
+	}
 
+	.placeholder {
+		width: 16rem;
+		height: 2.25rem;
 		transition: height 0.2s linear;
 	}
-	button {
-		padding: 0;
-		border: none;
-		background: none;
-		height: 6rem;
+
+	:scope:hover:not(.expanded) .placeholder {
+		height: 3rem;
 	}
 
-	:scope:has(> button:hover) {
-		height: 3rem;
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 99;
+		backdrop-filter: blur(0px);
+		background: transparent;
+		pointer-events: none;
+		transition: backdrop-filter 0.4s ease, background 0.4s ease;
+	}
+
+	:scope.expanded .backdrop {
+		pointer-events: auto;
+		backdrop-filter: blur(10px);
+		background: rgba(0, 0, 0, 0.3);
+	}
+
+	.sticky-note {
+		position: fixed;
+		bottom: 1rem;
+		left: 18rem;
+		width: 30rem;
+		height: 30rem;
+		cursor: pointer;
+		transform: rotate(-2deg) translateY(calc(100% - 3.5rem));
+		transform-origin: top right;
+		transition: transform 0.4s, bottom 0.4s, right 0.4s;
+		z-index: 100;
+	}
+
+	:scope:hover:not(.expanded) .sticky-note {
+		transform: rotate(0deg) translateY(calc(100% - 5rem));
+	}
+
+	.sticky-note > * {
+		width: 100%;
+		height: 100%;
+	}
+
+	:scope.expanded .sticky-note {
+		bottom: 50%;
+		right: 50%;
+		transform: rotate(0deg) translate(50%, 50%);
 	}
 `;
 
-export let GameView: Component<{ preinit: Delegate<void>, showSplash: boolean, }, { setupStep: SetupStep, copyProgress: number, patching: boolean }> = function () {
+export let GameView: Component<{ preinit: Delegate<void> }, { setupStep: SetupStep, copyProgress: number, patching: boolean }> = function () {
 	this.preinit.listen(async () => {
 		await preInit();
 	})
@@ -282,7 +336,7 @@ export let GameView: Component<{ preinit: Delegate<void>, showSplash: boolean, }
 			</div>
 			<div class="buttons">
 				<CopyAssetsSlot insertDisk={insertDisk} />
-				<StickyNoteButton open={() => this.showSplash = true}/>
+				<StickyNoteWidget />
 				<div class="expand" />
 				<PlayButton onPower={handlePower} />
 			</div>
@@ -319,7 +373,7 @@ GameView.style = css`
 		--width: calc(var(--height) * 16 / 9);
 		height: var(--height);
 		aspect-ratio: 16 / 9;
-		cursor: none;
+		/* cursor: none; */
 		position: relative;
 	}
 	.canvas-wrapper > * {
