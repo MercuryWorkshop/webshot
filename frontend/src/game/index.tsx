@@ -47,7 +47,7 @@ PlayButton.style = css`
 
 let CopyAssetsSlot: Component<{ copy: () => void }> = function () {
 	return (
-		<button on:click={this.copy}>
+		<button on:click={this.copy} disabled={use(gameState.playing)}>
 			World Machine OS
 			<div class="led" class:blinking={use(gameState.assetsReady).map(x => !x)} />
 		</button>
@@ -66,6 +66,9 @@ CopyAssetsSlot.style = css`
 		padding: 0.5rem;
 
 		font-size: 1.5rem;
+	}
+	:scope:disabled {
+		cursor: not-allowed;
 	}
 
 	.led {
