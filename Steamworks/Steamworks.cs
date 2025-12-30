@@ -21,6 +21,8 @@ namespace Steamworks
 
 		[JSImport("GetPersonaName", "SteamJS")]
 		public static partial string GetPersonaName();
+		[JSImport("GetLanguage", "SteamJS")]
+		public static partial string GetLanguage();
     }
 
     public class SteamAPI
@@ -44,7 +46,7 @@ namespace Steamworks
     {
         public static string GetCurrentGameLanguage()
         {
-            return "english";
+            return SteamJS.GetLanguage();
         }
     }
 

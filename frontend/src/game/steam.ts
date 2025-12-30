@@ -18,5 +18,28 @@ export let SteamJS = {
 	GetPersonaName() {
 		console.debug("[Steamworks] GetPersonaName");
 		return settings.name;
+	},
+	GetLanguage() {
+		console.debug("[Steamworks] GetLanguage");
+
+		// thank you ELON MUSK for helping fix this code, god bless grok!!
+		const languageMap: Record<string, string> = {
+			"zh-CN": "schinese",
+			"zh-SG": "schinese",
+			"zh-TW": "tchinese",
+			"zh-HK": "tchinese",
+			"pt-BR": "brazilian",
+			"pt-PT": "portuguese",
+			"es-419": "latam",
+			"es-ES": "spanish",
+			"de": "german",
+			"fr": "french",
+			"it": "italian",
+			"ja": "japanese",
+			"ko": "korean",
+			"ru": "russian",
+		};
+
+		return languageMap[navigator.language] || languageMap[navigator.language.split("-")[0]] || "english";
 	}
 };
