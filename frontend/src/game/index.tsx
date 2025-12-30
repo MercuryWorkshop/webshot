@@ -524,7 +524,7 @@ GameView.style = css`
 		--width: calc(var(--height) * 16 / 9);
 		height: var(--height);
 		aspect-ratio: 16 / 9;
-		/* cursor: none; */
+		cursor: none;
 		position: relative;
 	}
 	.canvas-wrapper > * {
