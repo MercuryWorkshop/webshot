@@ -136,3 +136,4 @@ export async function wasPatched(): Promise<boolean> {
 }
 
 gameState.assetsReady = await wasGameCopied() && await wasPatched();
+gameState.diskInserted = gameState.assetsReady;
